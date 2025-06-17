@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Skin Cancer Classification Demo</title>
+</head>
+<body>
+  <h1>Skin Cancer Classifier</h1>
+  <input type="file" id="imageInput" accept="image/*" />
+  <pre id="output"></pre>
+
+  <script>
+    async function classifySkinCancer(imageFile) {
+      const API_URL = "https://api-inference.huggingface.co/models/Anwarkh1/Skin_Cancer-Image_Classification";
+      const API_TOKEN = ""; // <-- Replace with your Hugging Face API token
+
+      // Convert image to ArrayBuffer
+      const arrayBuffer = await imageFile.arrayBuffer();
+
+      // Call the Hugging Face inference API
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${API_TOKEN}`,
+          "Content-Type": "application/octet-stream"
+        },
+        body: arrayBuffer
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+  throw new Error(`API error: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const predictions = await response.json();
+      return predictions;
+    }
+
+    const inputElement = document.getElementById("imageInput");
+    const outputElement = document.getElementById("output");
+
+    inputElement.addEventListener("change", async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      outputElement.textContent = "Classifying...";
+
+      try {
+        const results = await classifySkinCancer(file);
+        outputElement.textContent = JSON.stringify(results, null, 2);
+      } catch (err) {
+        outputElement.textContent = `Error: ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>

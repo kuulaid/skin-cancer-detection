@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <link rel="stylesheet" href="../src/style/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+
+</head>
+<body>
+
+  <div class="page-content">
+    <div id="avatarWrapper" class="avatar-wrapper">
+      <div class = "avatar-container"> 
+        <div class="avatar">
+            <dotlottie-player id="avatarAnimation"
+            src="https://lottie.host/12173816-9a40-4582-a7b5-0d435a7faa9a/zcXAKMutTb.lottie"
+            background="transparent"
+            speed="1"
+            loop
+            autoplay
+          ></dotlottie-player>
+        </div>
+        <div id="avatarSpeech" class="avatar-speech-bubble"> HELLO!</div>
+      </div>
+
+    </div>
+
+    <div class="input-wrapper">
+      <div class="input-container">
+    
+        <div class="input-header">
+          <div class="slider-indicator"></div>
+          <button class="camera-option active" data-option="camera">Camera</button>
+          <button class="camera-option" data-option="file">Upload</button>
+        </div>
+
+        <div class="camera-preview-container"> 
+          <div class="camera-preview-message">
+            Preview will appear here. 
+          </div>
+        </div>
+
+        <div class="camera-actions-container">
+            <!-- Camera mode buttons -->
+          <button class="start-camera">Start Camera</button>
+          <button class="take-photo">Take Photo</button>
+
+          <!-- Upload mode button -->
+        <button class="upload-file" style="display: none;">Upload File</button>
+        </div>
+      
+
+    </div>
+  
+  </div>
+  
+
+  <script
+  src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+  type="module"></script>
+
+  <script type="module" src="/src/scripts/button.js"></script>
+  <script type="module" src="/src/scripts/text.js"></script>
+  <script type="module" src="/src/scripts/result.js"></script>
+
+</body>
+</html>

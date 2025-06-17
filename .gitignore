@@ -1,0 +1,8 @@
+# .gitignore
+tf-env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+server.js
