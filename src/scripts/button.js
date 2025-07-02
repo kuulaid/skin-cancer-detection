@@ -1,4 +1,4 @@
-import { moveAvatarAndShowResult } from './result.js';
+import { handleImageResult, toBase64 } from './result.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -11,11 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const uploadFileButton = document.querySelector('.upload-file');
 
   const sliderIndicator = document.querySelector('.slider-indicator');
+  const avatarSpeech = document.getElementById('avatarSpeech');
 
   let stream;
   let video;
 
-  // Move slider and toggle modes
+  // Toggle Camera/File Mode
   cameraOptionButtons.forEach((button, index) => {
     button.addEventListener('click', () => {
       cameraOptionButtons.forEach(btn => btn.classList.remove('active'));
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     classifySkinCancerDataUrl(imageDataUrl);
   });
 
-  // Upload File (via click)
+  // Upload File via Click
   cameraPreviewMessage.addEventListener('click', () => {
     if (cameraPreviewMessage.classList.contains('drag-drop')) {
       const fileInput = document.createElement('input');
@@ -98,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Drag-and-Drop behavior
+  // Drag and Drop
   cameraPreviewMessage.addEventListener('dragover', (e) => {
     if (cameraPreviewMessage.classList.contains('drag-drop')) {
       e.preventDefault();
@@ -117,12 +118,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cameraPreviewMessage.classList.contains('drag-drop')) {
       e.preventDefault();
       cameraPreviewMessage.style.backgroundColor = '';
-
       const file = e.dataTransfer.files[0];
       displayUploadedFile(file);
       await classifySkinCancer(file);
     }
   });
+
+  //Display photo
+
+  function displayUploadedFile(file) {
+  const cameraPreviewMessage = document.querySelector('.camera-preview-message');
+  const imageUrl = URL.createObjectURL(file);
+  cameraPreviewMessage.innerHTML = `<img src="${imageUrl}" alt="Uploaded Image" />`;
+  cameraPreviewMessage.classList.add('has-image');
+}
+
+
+  async function classifySkinCancer(file) {
+  const base64 = await toBase64(file);
+  const previewUrl = URL.createObjectURL(file);
+  await handleImageResult(base64, previewUrl);
+}
+
+async function classifySkinCancerDataUrl(dataUrl) {
+  const blob = await (await fetch(dataUrl)).blob();
+  const base64 = await toBase64(blob);
+  await handleImageResult(base64, dataUrl);
+}
+
 
   function stopCamera() {
     if (stream) {
@@ -131,55 +154,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function displayUploadedFile(file) {
-    const imageUrl = URL.createObjectURL(file);
-    cameraPreviewMessage.innerHTML = `<img src="${imageUrl}" alt="Uploaded Image" />`;
-    cameraPreviewMessage.classList.add('has-image');
-  }
 
-  // Convert image file to base64
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result.split(',')[1]); // Remove data:image/png;base64,
-      reader.onerror = error => reject(error);
-    });
-  }
 
-  // Send base64 image to Node.js backend
-  async function classifySkinCancer(imageFile) {
-    try {
-      const base64 = await toBase64(imageFile);
 
-      const response = await fetch('http://localhost:3000/classify', { // Your Node.js backend URL
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64 })
-      });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        alert(`Backend error: ${response.status} ${response.statusText} - ${errorText}`);
-        return;
-      }
 
-      const predictions = await response.json();
-      console.log(predictions);
-      
-      localStorage.setItem('classificationResult', predictions.result || 'Result here');
-      window.location.href = '/src/pages/result.html';
 
-    } catch (error) {
-      console.error(error);
-      alert(`Error: ${error.message}`);
-    }
-  }
 
-  async function classifySkinCancerDataUrl(imageDataUrl) {
-    const response = await fetch(imageDataUrl);
-    const blob = await response.blob();
-    await classifySkinCancer(blob);
-  }
+
+
+
+
+
+
+
+
+
+
+
 });
-
